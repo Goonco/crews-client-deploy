@@ -31,7 +31,6 @@ const useAuthInstance = () => {
         return config;
       },
       (e) => {
-        clearSession();
         return Promise.reject(e);
       },
     );
@@ -50,7 +49,7 @@ const useAuthInstance = () => {
           return authInstance(prevRequest);
         }
 
-        clearSession();
+        if (error?.response?.status === 403) clearSession();
         return Promise.reject(error);
       },
     );

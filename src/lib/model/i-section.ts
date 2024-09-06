@@ -5,7 +5,7 @@ type IBaseQuestion = {
   order: number;
 };
 
-type IChoice = {
+export type IChoice = {
   id: number;
   content: string;
 };
@@ -87,6 +87,11 @@ export const CREATED_SECTION: ICreatedSection = {
   name: '',
   description: '',
   questions: [CREATED_SELECTIVE_QUESTION],
+};
+
+export const CREATED_CHOICE: ICreatedChoice = {
+  id: null,
+  content: '',
 };
 
 // ---------------------------------- Type Guards ----------------------------------
