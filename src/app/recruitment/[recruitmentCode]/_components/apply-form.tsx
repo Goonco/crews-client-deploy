@@ -49,17 +49,18 @@ const ApplyForm = () => {
     }
 
     try {
-      const { accessToken } = await applicantLogin(data);
+      const { accessToken, username } = await applicantLogin(data);
 
       if (recruitmentCode)
         localStorage.setItem('recruitmentCode', recruitmentCode);
 
-      setSession(accessToken);
+      setSession(accessToken, username);
       navigate(`/apply/${recruitmentCode}`);
     } catch (e) {
-      printCustomError(e, 'applicantLogin');
+      const errorStatus = printCustomError(e, 'applicantLogin');
 
-      const title = '예기치 못한 문제가 발생했습니다.';
+      let title = '예기치 못한 문제가 발생했습니다.';
+      if (errorStatus === 401) title = '잘못된 비밀번호입니다.';
 
       toast({
         title,

@@ -4,6 +4,7 @@ import Typography from '../../../../components/shared/typography';
 import { IQuestion } from '../../../../lib/model/i-section';
 import { cn } from '../../../../lib/utils';
 import { IFormApplication } from '../page';
+import React, { useEffect } from 'react';
 
 interface ApplyNarrativeBoxProps {
   question: IQuestion;
@@ -23,21 +24,20 @@ const ApplyNarrativeBox = ({ question }: ApplyNarrativeBoxProps) => {
       answer.questionId === question.id && answer.questionType === 'NARRATIVE',
   );
 
-  // make new answer if not exist, cuurentAnswerIndex === -1인 item 생성 방지를 위해 return null
-  if (currentAnswerIndex === -1) {
-    setValue('answers', [
-      ...watch('answers'),
-      {
-        answerId: null,
-        questionId: question.id,
-        content: '',
-        choiceIds: null,
-        questionType: 'NARRATIVE',
-      },
-    ]);
-
-    return null;
-  }
+  useEffect(() => {
+    if (currentAnswerIndex === -1) {
+      setValue('answers', [
+        ...watch('answers'),
+        {
+          answerId: null,
+          questionId: question.id,
+          content: '',
+          choiceIds: null,
+          questionType: 'NARRATIVE',
+        },
+      ]);
+    }
+  }, [currentAnswerIndex, question.id, setValue, watch]);
 
   const currentContent = watch(`answers.${currentAnswerIndex}.content`) || '';
   const necessityText = question.necessity ? '응답 필수' : '';
@@ -51,19 +51,21 @@ const ApplyNarrativeBox = ({ question }: ApplyNarrativeBoxProps) => {
   const displayText = [necessityText, wordLimitText].filter(Boolean).join(', ');
 
   return (
-    <Container className="rounded-[0.625rem] bg-crews-w01 px-[1.25rem] py-[1.25rem]">
-      <div className="flex flex-col gap-[1rem]">
-        <div className="flex flex-col gap-[0.625rem]">
-          <Typography className="text-[1rem] font-bold text-crews-bk01">
+    <Container className="rounded-xl bg-crews-w01 p-3">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <Typography className="h-auto w-full text-sm font-semibold text-crews-bk01">
             {question.content}
           </Typography>
-          <Typography className="text-[0.875rem] text-crews-b06">
+          <Typography className="text-xs text-crews-b06">
             {displayText}
           </Typography>
         </div>
+
         <textarea
+          rows={3}
           className={cn(
-            'w-full rounded-[0.625rem] p-[1rem] text-[0.875rem] outline outline-[1px] outline-crews-g04 placeholder:text-crews-g04',
+            'w-full rounded-lg p-2 text-xs outline outline-1 outline-crews-g02 placeholder:font-light placeholder:text-crews-g03',
             {
               'outline-crews-g04': !isFieldError,
               'outline-crews-r03': isFieldError,
@@ -89,7 +91,7 @@ const ApplyNarrativeBox = ({ question }: ApplyNarrativeBoxProps) => {
         />
       </div>
       {isFieldError && (
-        <Typography className="text-[0.875rem] text-crews-r03">
+        <Typography className="text-xs text-crews-r03">
           {errors.answers?.[currentAnswerIndex]?.content?.message}
         </Typography>
       )}
