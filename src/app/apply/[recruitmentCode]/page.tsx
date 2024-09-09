@@ -71,7 +71,7 @@ const Page = () => {
   );
 
   const { data: recruitment, ...recruitmentQuery } = useQuery({
-    queryKey: ['recruitmentByCode'],
+    queryKey: ['recruitmentByCode', recruitmentCode],
     queryFn: () => readRecruitmentByCode(recruitmentCode!),
     enabled: !!recruitmentCode,
   });
@@ -275,15 +275,12 @@ const Page = () => {
   }, [recruitment]);
 
   const isRecruitmentError =
-    recruitmentQuery.error ||
-    !recruitment ||
-    !sharedSection ||
-    !selectedSection;
+    recruitmentQuery.error || !recruitment || !sharedSection;
 
   if (applicationQuery.isFetching || recruitmentQuery.isFetching)
     return <Loading />;
   else if (isRecruitmentError) {
-    printCustomError(recruitmentQuery.error, 'readRecruitmentByCode');
+    printCustomError(recruitmentQuery.error, 'readQuery');
     return <Navigate to="/error" replace />;
   } else if (applicationQuery.isError) {
     printCustomError(applicationQuery.error, 'readApplication');
@@ -309,29 +306,36 @@ const Page = () => {
                   ))}
                 </div>
               </ApplySectionBox>
+              {selectedSection && (
+                <>
+                  <p className="mt-4 text-base font-semibold text-crews-bk01">
+                    제출 시 선택된 섹션의 내용만이 저장됩니다.
+                  </p>
+                  <div className="flex w-full flex-col">
+                    <ApplySectionHeader
+                      sections={recruitment.sections}
+                      selectionIndex={sectionSelections}
+                      handleSelectionChange={handleSectionSelectionChange}
+                    />
 
-              <p className="text-base font-light text-crews-g05">
-                제출 시 선택된 섹션의 내용만이 전송된다는 점 주의하세요.
-              </p>
-              <div className="flex w-full flex-col">
-                <ApplySectionHeader
-                  sections={recruitment.sections}
-                  selectionIndex={sectionSelections}
-                  handleSelectionChange={handleSectionSelectionChange}
-                />
-                <ApplySectionBox
-                  key={selectedSection.id}
-                  name={selectedSection.name}
-                  description={selectedSection.description}
-                  isSelectable={true}
-                >
-                  <div className="flex flex-col gap-8">
-                    {selectedSection.questions.map((question) => (
-                      <RenderQuestion key={question.id} question={question} />
-                    ))}
+                    <ApplySectionBox
+                      key={selectedSection.id}
+                      name={selectedSection.name}
+                      description={selectedSection.description}
+                      isSelectable={true}
+                    >
+                      <div className="flex flex-col gap-8">
+                        {selectedSection.questions.map((question) => (
+                          <RenderQuestion
+                            key={question.id}
+                            question={question}
+                          />
+                        ))}
+                      </div>
+                    </ApplySectionBox>
                   </div>
-                </ApplySectionBox>
-              </div>
+                </>
+              )}
             </div>
             <FooterContainer className="flex w-full justify-end">
               <Button type="submit" size="lg" disabled={!ableToSubmit}>
